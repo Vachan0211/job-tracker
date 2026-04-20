@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Job Tracker</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #ffffff; --bg2: #f5f5f3; --bg3: #efefec;
+    --text: #1a1a18; --text2: #6b6b67; --text3: #a0a09c;
+    --border: rgba(0,0,0,0.1); --border2: rgba(0,0,0,0.18);
+    --blue-bg: #E6F1FB; --blue-text: #0C447C; --blue-border: #378ADD;
+    --amber-bg: #FAEEDA; --amber-text: #633806; --amber-border: #EF9F27;
+    --purple-bg: #EEEDFE; --purple-text: #3C3489; --purple-border: #7F77DD;
+    --green-bg: #EAF3DE; --green-text: #27500A; --green-border: #639922;
+    --red-bg: #FCEBEB; --red-text: #791F1F; --red-border: #E24B4A;
+    --gray-bg: #F1EFE8; --gray-text: #444441; --gray-border: #888780;
+    --radius: 8px; --radius-lg: 12px;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #1c1c1a; --bg2: #252522; --bg3: #2e2e2b;
+      --text: #f0f0ec; --text2: #a0a09c; --text3: #6b6b67;
+      --border: rgba(255,255,255,0.1); --border2: rgba(255,255,255,0.18);
+      --blue-bg: #042C53; --blue-text: #B5D4F4; --blue-border: #378ADD;
+      --amber-bg: #412402; --amber-text: #FAC775; --amber-border: #EF9F27;
+      --purple-bg: #26215C; --purple-text: #CECBF6; --purple-border: #7F77DD;
+      --green-bg: #173404; --green-text: #C0DD97; --green-border: #639922;
+      --red-bg: #501313; --red-text: #F7C1C1; --red-border: #E24B4A;
+      --gray-bg: #2C2C2A; --gray-text: #D3D1C7; --gray-border: #888780;
+    }
+  }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg3); color: var(--text); min-height: 100vh; }
+  .page { max-width: 760px; margin: 0 auto; padding: 32px 16px 64px; }
+  h1 { font-size: 20px; font-weight: 500; margin-bottom: 6px; }
+  .subtitle { font-size: 13px; color: var(--text2); margin-bottom: 24px; }
+  .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 20px; }
+  .stat { background: var(--bg); border-radius: var(--radius); padding: 14px 16px; border: 0.5px solid var(--border); }
+  .stat-num { font-size: 24px; font-weight: 500; line-height: 1; }
+  .stat-label { font-size: 12px; color: var(--text2); margin-top: 4px; }
+  .add-card { background: var(--bg); border: 0.5px solid var(--border); border-radius: var(--radius-lg); padding: 14px 16px; margin-bottom: 16px; }
+  .add-toggle { font-size: 14px; font-weight: 500; color: var(--text); cursor: pointer; display: flex; align-items: center; gap: 10px; background: none; border: none; padding: 0; width: 100%; text-align: left; }
+  .plus { width: 22px; height: 22px; border-radius: 5px; background: var(--blue-bg); color: var(--blue-text); display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: 400; flex-shrink: 0; }
+  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 16px; }
+  .field label { font-size: 12px; color: var(--text2); display: block; margin-bottom: 4px; }
+  .field input, .field select, .field textarea {
+    width: 100%; font-size: 13px; padding: 8px 10px; border: 0.5px solid var(--border2);
+    border-radius: var(--radius); background: var(--bg2); color: var(--text);
+    font-family: inherit; outline: none; appearance: none;
+  }
+  .field input:focus, .field select:focus, .field textarea:focus { border-color: var(--blue-border); box-shadow: 0 0 0 2px rgba(55,138,221,0.15); }
+  .field textarea { height: 64px; resize: vertical; }
+  .field.full { grid-column: 1 / -1; }
+  .form-actions { display: flex; gap: 8px; margin-top: 12px; }
+  .btn-primary { background: var(--blue-bg); color: var(--blue-text); border: 0.5px solid var(--blue-border); border-radius: var(--radius); padding: 8px 18px; font-size: 13px; font-weight: 500; cursor: pointer; font-family: inherit; }
+  .btn-primary:hover { opacity: 0.85; }
+  .btn-cancel { background: none; border: 0.5px solid var(--border2); border-radius: var(--radius); padding: 8px 18px; font-size: 13px; color: var(--text2); cursor: pointer; font-family: inherit; }
+  .filter-row { display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap; }
+  .filter-btn { font-size: 12px; padding: 5px 13px; border-radius: 20px; border: 0.5px solid var(--border2); background: none; color: var(--text2); cursor: pointer; font-family: inherit; }
+  .filter-btn.active { background: var(--bg2); color: var(--text); border-color: var(--border2); font-weight: 500; }
+  .app-list { display: flex; flex-direction: column; gap: 8px; }
+  .app-card { background: var(--bg); border: 0.5px solid var(--border); border-radius: var(--radius-lg); padding: 13px 15px; display: grid; grid-template-columns: 1fr auto; gap: 10px; align-items: start; transition: border-color 0.15s; }
+  .app-card:hover { border-color: var(--border2); }
+  .app-company { font-size: 14px; font-weight: 500; }
+  .app-role { font-size: 13px; color: var(--text2); margin-top: 2px; }
+  .app-meta { font-size: 12px; color: var(--text3); margin-top: 8px; display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
+  .app-notes { font-size: 12px; color: var(--text2); margin-top: 8px; padding-top: 8px; border-top: 0.5px solid var(--border); }
+  .badge { font-size: 11px; font-weight: 500; padding: 3px 9px; border-radius: 20px; }
+  .b-applied   { background: var(--blue-bg);   color: var(--blue-text); }
+  .b-phone     { background: var(--amber-bg);  color: var(--amber-text); }
+  .b-interview { background: var(--purple-bg); color: var(--purple-text); }
+  .b-offer     { background: var(--green-bg);  color: var(--green-text); }
+  .b-rejected  { background: var(--red-bg);    color: var(--red-text); }
+  .b-ghosted   { background: var(--gray-bg);   color: var(--gray-text); }
+  .app-right { display: flex; flex-direction: column; align-items: flex-end; gap: 8px; }
+  .status-sel { font-size: 12px; border: 0.5px solid var(--border2); border-radius: var(--radius); padding: 4px 8px; background: var(--bg2); color: var(--text); cursor: pointer; font-family: inherit; appearance: none; }
+  .del-btn { font-size: 11px; color: var(--text3); background: none; border: none; cursor: pointer; padding: 0; font-family: inherit; }
+  .del-btn:hover { color: var(--red-text); }
+  .empty { text-align: center; padding: 48px 20px; color: var(--text3); font-size: 13px; background: var(--bg); border: 0.5px dashed var(--border2); border-radius: var(--radius-lg); }
+  .hidden { display: none !important; }
+  @media (max-width: 500px) { .stats { grid-template-columns: 1fr 1fr; } .form-grid { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<div class="page">
+  <h1>Job tracker</h1>
+  <p class="subtitle">Log applications, track status, stay on top of your search.</p>
+
+  <div class="stats">
+    <div class="stat"><div class="stat-num" id="s-total">0</div><div class="stat-label">Total applied</div></div>
+    <div class="stat"><div class="stat-num" id="s-interview">0</div><div class="stat-label">Interviews</div></div>
+    <div class="stat"><div class="stat-num" id="s-offer">0</div><div class="stat-label">Offers</div></div>
+    <div class="stat"><div class="stat-num" id="s-rate">—</div><div class="stat-label">Response rate</div></div>
+  </div>
+
+  <div class="add-card">
+    <button class="add-toggle" id="add-toggle">
+      <span class="plus" id="plus-icon">+</span>
+      <span id="toggle-label">Add new application</span>
+    </button>
+    <div id="add-form" class="hidden">
+      <div class="form-grid">
+        <div class="field"><label>Company</label><input id="f-company" type="text" placeholder="e.g. Stripe"></div>
+        <div class="field"><label>Role</label><input id="f-role" type="text" placeholder="e.g. Software Engineer"></div>
+        <div class="field"><label>Date applied</label><input id="f-date" type="date"></div>
+        <div class="field"><label>Status</label>
+          <select id="f-status">
+            <option value="applied">Applied</option>
+            <option value="phone">Phone screen</option>
+            <option value="interview">Interview</option>
+            <option value="offer">Offer</option>
+            <option value="rejected">Rejected</option>
+            <option value="ghosted">Ghosted</option>
+          </select>
+        </div>
+        <div class="field full"><label>Notes</label><textarea id="f-notes" placeholder="Recruiter name, job link, anything useful..."></textarea></div>
+      </div>
+      <div class="form-actions">
+        <button class="btn-primary" id="save-btn">Save application</button>
+        <button class="btn-cancel" id="cancel-btn">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="filter-row" id="filters">
+    <button class="filter-btn active" data-filter="all">All</button>
+    <button class="filter-btn" data-filter="applied">Applied</button>
+    <button class="filter-btn" data-filter="phone">Phone screen</button>
+    <button class="filter-btn" data-filter="interview">Interview</button>
+    <button class="filter-btn" data-filter="offer">Offer</button>
+    <button class="filter-btn" data-filter="rejected">Rejected</button>
+    <button class="filter-btn" data-filter="ghosted">Ghosted</button>
+  </div>
+
+  <div class="app-list" id="app-list"></div>
+</div>
+
+<script>
+const STORAGE_KEY = 'job_tracker_apps';
+let apps = [];
+let filter = 'all';
+let formOpen = false;
+
+const statusLabels = {applied:'Applied',phone:'Phone screen',interview:'Interview',offer:'Offer',rejected:'Rejected',ghosted:'Ghosted'};
+const statusClass  = {applied:'b-applied',phone:'b-phone',interview:'b-interview',offer:'b-offer',rejected:'b-rejected',ghosted:'b-ghosted'};
+
+function load() {
+  try { apps = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]'); } catch(e) { apps = []; }
+  render();
+}
+
+function save() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(apps));
+}
+
+function esc(s) {
+  return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function updateStats() {
+  const total = apps.length;
+  const interviews = apps.filter(a => a.status === 'interview' || a.status === 'offer').length;
+  const offers = apps.filter(a => a.status === 'offer').length;
+  const responded = apps.filter(a => !['applied','ghosted'].includes(a.status)).length;
+  document.getElementById('s-total').textContent = total;
+  document.getElementById('s-interview').textContent = interviews;
+  document.getElementById('s-offer').textContent = offers;
+  document.getElementById('s-rate').textContent = total > 0 ? Math.round((responded / total) * 100) + '%' : '—';
+}
+
+function render() {
+  updateStats();
+  const list = document.getElementById('app-list');
+  const filtered = filter === 'all' ? apps : apps.filter(a => a.status === filter);
+  const sorted = [...filtered].sort((a,b) => new Date(b.date) - new Date(a.date));
+
+  if (sorted.length === 0) {
+    list.innerHTML = `<div class="empty">${filter === 'all' ? 'No applications yet — add your first one above.' : 'No applications with status "' + statusLabels[filter] + '".'}</div>`;
+    return;
+  }
+
+  list.innerHTML = sorted.map(a => {
+    const dateStr = a.date ? new Date(a.date + 'T12:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}) : '';
+    const opts = Object.entries(statusLabels).map(([v,l]) => `<option value="${v}"${v===a.status?' selected':''}>${l}</option>`).join('');
+    return `<div class="app-card">
+      <div>
+        <div class="app-company">${esc(a.company)}</div>
+        <div class="app-role">${esc(a.role)}</div>
+        <div class="app-meta">
+          <span class="badge ${statusClass[a.status]}">${statusLabels[a.status]}</span>
+          ${dateStr ? `<span>${dateStr}</span>` : ''}
+        </div>
+        ${a.notes ? `<div class="app-notes">${esc(a.notes)}</div>` : ''}
+      </div>
+      <div class="app-right">
+        <select class="status-sel" onchange="changeStatus('${a.id}',this.value)">${opts}</select>
+        <button class="del-btn" onclick="deleteApp('${a.id}')">remove</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function changeStatus(id, val) {
+  const a = apps.find(x => x.id === id);
+  if (a) { a.status = val; save(); render(); }
+}
+
+function deleteApp(id) {
+  if (!confirm('Remove this application?')) return;
+  apps = apps.filter(x => x.id !== id);
+  save(); render();
+}
+
+document.getElementById('add-toggle').addEventListener('click', () => {
+  formOpen = !formOpen;
+  document.getElementById('add-form').classList.toggle('hidden', !formOpen);
+  document.getElementById('plus-icon').textContent = formOpen ? '×' : '+';
+  document.getElementById('toggle-label').textContent = formOpen ? 'Close' : 'Add new application';
+  if (formOpen) { document.getElementById('f-date').valueAsDate = new Date(); document.getElementById('f-company').focus(); }
+});
+
+document.getElementById('cancel-btn').addEventListener('click', () => {
+  formOpen = false;
+  document.getElementById('add-form').classList.add('hidden');
+  document.getElementById('plus-icon').textContent = '+';
+  document.getElementById('toggle-label').textContent = 'Add new application';
+});
+
+document.getElementById('save-btn').addEventListener('click', () => {
+  const company = document.getElementById('f-company').value.trim();
+  const role = document.getElementById('f-role').value.trim();
+  if (!company) { document.getElementById('f-company').focus(); return; }
+  if (!role) { document.getElementById('f-role').focus(); return; }
+  apps.push({
+    id: Date.now().toString(),
+    company, role,
+    date: document.getElementById('f-date').value,
+    status: document.getElementById('f-status').value,
+    notes: document.getElementById('f-notes').value.trim()
+  });
+  document.getElementById('f-company').value = '';
+  document.getElementById('f-role').value = '';
+  document.getElementById('f-notes').value = '';
+  document.getElementById('f-status').value = 'applied';
+  formOpen = false;
+  document.getElementById('add-form').classList.add('hidden');
+  document.getElementById('plus-icon').textContent = '+';
+  document.getElementById('toggle-label').textContent = 'Add new application';
+  save(); render();
+});
+
+document.getElementById('filters').addEventListener('click', e => {
+  const btn = e.target.closest('.filter-btn');
+  if (!btn) return;
+  filter = btn.dataset.filter;
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.toggle('active', b.dataset.filter === filter));
+  render();
+});
+
+load();
+</script>
+</body>
+</html>
