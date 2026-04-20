@@ -33,12 +33,34 @@
   }
   body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg3); color: var(--text); min-height: 100vh; }
   .page { max-width: 760px; margin: 0 auto; padding: 32px 16px 64px; }
-  h1 { font-size: 20px; font-weight: 500; margin-bottom: 6px; }
+  h1 { font-size: 20px; font-weight: 500; margin-bottom: 4px; }
   .subtitle { font-size: 13px; color: var(--text2); margin-bottom: 24px; }
-  .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 20px; }
+  .stats { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin-bottom: 16px; }
   .stat { background: var(--bg); border-radius: var(--radius); padding: 14px 16px; border: 0.5px solid var(--border); }
-  .stat-num { font-size: 24px; font-weight: 500; line-height: 1; }
-  .stat-label { font-size: 12px; color: var(--text2); margin-top: 4px; }
+  .stat-num { font-size: 22px; font-weight: 500; line-height: 1; }
+  .stat-label { font-size: 11px; color: var(--text2); margin-top: 4px; }
+  .stat.today { border-color: var(--blue-border); }
+  .stat.streak .stat-num { color: var(--amber-text); }
+
+  .section-label { font-size: 11px; font-weight: 500; color: var(--text3); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 10px; }
+  .activity-card { background: var(--bg); border: 0.5px solid var(--border); border-radius: var(--radius-lg); padding: 16px; margin-bottom: 16px; }
+  .chart-wrap { display: flex; align-items: flex-end; gap: 4px; height: 72px; margin-bottom: 6px; }
+  .bar-col { display: flex; flex-direction: column; align-items: center; flex: 1; gap: 4px; height: 100%; justify-content: flex-end; }
+  .bar { width: 100%; border-radius: 3px 3px 0 0; background: var(--blue-bg); min-height: 2px; cursor: default; position: relative; }
+  .bar.today-bar { background: var(--blue-border); }
+  .bar:hover::after { content: attr(data-tip); position: absolute; bottom: calc(100% + 4px); left: 50%; transform: translateX(-50%); background: var(--text); color: var(--bg); font-size: 11px; padding: 3px 7px; border-radius: 4px; white-space: nowrap; pointer-events: none; z-index: 10; }
+  .bar-day { font-size: 10px; color: var(--text3); text-align: center; }
+  .chart-footer { display: flex; justify-content: space-between; margin-top: 8px; }
+  .chart-note { font-size: 12px; color: var(--text2); }
+
+  .daily-log { margin-top: 14px; border-top: 0.5px solid var(--border); padding-top: 12px; }
+  .day-row { display: flex; justify-content: space-between; align-items: center; padding: 7px 0; border-bottom: 0.5px solid var(--border); font-size: 13px; }
+  .day-row:last-child { border-bottom: none; }
+  .day-name { color: var(--text2); }
+  .day-count { font-weight: 500; color: var(--text); display: flex; align-items: center; gap: 8px; }
+  .day-dots { display: flex; gap: 3px; flex-wrap: wrap; max-width: 120px; justify-content: flex-end; }
+  .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--blue-border); opacity: 0.65; }
+
   .add-card { background: var(--bg); border: 0.5px solid var(--border); border-radius: var(--radius-lg); padding: 14px 16px; margin-bottom: 16px; }
   .add-toggle { font-size: 14px; font-weight: 500; color: var(--text); cursor: pointer; display: flex; align-items: center; gap: 10px; background: none; border: none; padding: 0; width: 100%; text-align: left; }
   .plus { width: 22px; height: 22px; border-radius: 5px; background: var(--blue-bg); color: var(--blue-text); display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: 400; flex-shrink: 0; }
@@ -58,9 +80,9 @@
   .btn-cancel { background: none; border: 0.5px solid var(--border2); border-radius: var(--radius); padding: 8px 18px; font-size: 13px; color: var(--text2); cursor: pointer; font-family: inherit; }
   .filter-row { display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap; }
   .filter-btn { font-size: 12px; padding: 5px 13px; border-radius: 20px; border: 0.5px solid var(--border2); background: none; color: var(--text2); cursor: pointer; font-family: inherit; }
-  .filter-btn.active { background: var(--bg2); color: var(--text); border-color: var(--border2); font-weight: 500; }
+  .filter-btn.active { background: var(--bg2); color: var(--text); font-weight: 500; }
   .app-list { display: flex; flex-direction: column; gap: 8px; }
-  .app-card { background: var(--bg); border: 0.5px solid var(--border); border-radius: var(--radius-lg); padding: 13px 15px; display: grid; grid-template-columns: 1fr auto; gap: 10px; align-items: start; transition: border-color 0.15s; }
+  .app-card { background: var(--bg); border: 0.5px solid var(--border); border-radius: var(--radius-lg); padding: 13px 15px; display: grid; grid-template-columns: 1fr auto; gap: 10px; align-items: start; }
   .app-card:hover { border-color: var(--border2); }
   .app-company { font-size: 14px; font-weight: 500; }
   .app-role { font-size: 13px; color: var(--text2); margin-top: 2px; }
@@ -79,19 +101,33 @@
   .del-btn:hover { color: var(--red-text); }
   .empty { text-align: center; padding: 48px 20px; color: var(--text3); font-size: 13px; background: var(--bg); border: 0.5px dashed var(--border2); border-radius: var(--radius-lg); }
   .hidden { display: none !important; }
-  @media (max-width: 500px) { .stats { grid-template-columns: 1fr 1fr; } .form-grid { grid-template-columns: 1fr; } }
+  @media (max-width: 540px) {
+    .stats { grid-template-columns: 1fr 1fr 1fr; }
+    .form-grid { grid-template-columns: 1fr; }
+  }
 </style>
 </head>
 <body>
 <div class="page">
   <h1>Job tracker</h1>
-  <p class="subtitle">Log applications, track status, stay on top of your search.</p>
+  <p class="subtitle">Log applications, track your daily grind, stay on top of your search.</p>
 
   <div class="stats">
+    <div class="stat today"><div class="stat-num" id="s-today">0</div><div class="stat-label">Today</div></div>
+    <div class="stat streak"><div class="stat-num" id="s-streak">0</div><div class="stat-label">Day streak</div></div>
     <div class="stat"><div class="stat-num" id="s-total">0</div><div class="stat-label">Total applied</div></div>
     <div class="stat"><div class="stat-num" id="s-interview">0</div><div class="stat-label">Interviews</div></div>
-    <div class="stat"><div class="stat-num" id="s-offer">0</div><div class="stat-label">Offers</div></div>
     <div class="stat"><div class="stat-num" id="s-rate">—</div><div class="stat-label">Response rate</div></div>
+  </div>
+
+  <div class="activity-card">
+    <div class="section-label">Daily activity — last 14 days</div>
+    <div class="chart-wrap" id="chart-bars"></div>
+    <div class="chart-footer">
+      <span class="chart-note" id="chart-avg"></span>
+      <span class="chart-note" id="chart-best"></span>
+    </div>
+    <div class="daily-log" id="daily-log"></div>
   </div>
 
   <div class="add-card">
@@ -145,53 +181,115 @@ let formOpen = false;
 const statusLabels = {applied:'Applied',phone:'Phone screen',interview:'Interview',offer:'Offer',rejected:'Rejected',ghosted:'Ghosted'};
 const statusClass  = {applied:'b-applied',phone:'b-phone',interview:'b-interview',offer:'b-offer',rejected:'b-rejected',ghosted:'b-ghosted'};
 
+function toDateStr(d) {
+  return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+}
+
 function load() {
-  try { apps = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]'); } catch(e) { apps = []; }
+  try { apps = JSON.parse(localStorage.getItem(STORAGE_KEY)||'[]'); } catch(e) { apps=[]; }
   render();
 }
 
-function save() {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(apps));
-}
+function save() { localStorage.setItem(STORAGE_KEY, JSON.stringify(apps)); }
 
 function esc(s) {
   return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 
+function getStreak() {
+  if (!apps.length) return 0;
+  const days = new Set(apps.map(a=>a.date).filter(Boolean));
+  let streak = 0;
+  const today = new Date();
+  for (let i=0; i<365; i++) {
+    const d = new Date(today); d.setDate(d.getDate()-i);
+    if (days.has(toDateStr(d))) { streak++; } else if (i>0) { break; }
+  }
+  return streak;
+}
+
+function renderActivity() {
+  const barsEl = document.getElementById('chart-bars');
+  const logEl  = document.getElementById('daily-log');
+  const today  = new Date();
+  const days   = [];
+
+  for (let i=13; i>=0; i--) {
+    const d = new Date(today); d.setDate(d.getDate()-i);
+    days.push({ date: toDateStr(d), label: d.toLocaleDateString('en-US',{weekday:'short'}).slice(0,2), isToday: i===0 });
+  }
+
+  const counts = {};
+  days.forEach(d => { counts[d.date]=0; });
+  apps.forEach(a => { if (a.date && counts[a.date]!==undefined) counts[a.date]++; });
+
+  const max  = Math.max(...Object.values(counts), 1);
+  const total14 = Object.values(counts).reduce((s,v)=>s+v,0);
+  const best = Math.max(...Object.values(counts));
+  const activeDays = Object.values(counts).filter(v=>v>0).length;
+  const avg  = activeDays > 0 ? (total14/activeDays).toFixed(1) : '0';
+
+  document.getElementById('chart-avg').textContent  = `Avg ${avg} per active day`;
+  document.getElementById('chart-best').textContent = best > 0 ? `Best day: ${best} application${best!==1?'s':''}` : 'No applications yet';
+
+  barsEl.innerHTML = days.map(d => {
+    const c   = counts[d.date];
+    const pct = c > 0 ? Math.max(10, Math.round((c/max)*100)) : 3;
+    const h   = Math.round(pct * 0.68);
+    return `<div class="bar-col">
+      <div class="bar${d.isToday?' today-bar':''}" style="height:${h}px" data-tip="${d.date}: ${c} app${c!==1?'s':''}"></div>
+      <div class="bar-day" style="${d.isToday?'color:var(--blue-text);font-weight:500':''}">${d.label}</div>
+    </div>`;
+  }).join('');
+
+  const recentDays = [...days].reverse().filter(d=>counts[d.date]>0).slice(0,7);
+  if (!recentDays.length) {
+    logEl.innerHTML = '<div style="font-size:13px;color:var(--text3);padding:6px 0">No applications logged in the last 14 days yet.</div>';
+    return;
+  }
+  logEl.innerHTML = recentDays.map(d => {
+    const c     = counts[d.date];
+    const label = d.isToday ? 'Today' : new Date(d.date+'T12:00:00').toLocaleDateString('en-US',{weekday:'long',month:'short',day:'numeric'});
+    const dots  = Array(Math.min(c,12)).fill('<div class="dot"></div>').join('');
+    return `<div class="day-row">
+      <span class="day-name">${label}</span>
+      <span class="day-count"><div class="day-dots">${dots}</div>${c} app${c!==1?'s':''}</span>
+    </div>`;
+  }).join('');
+}
+
 function updateStats() {
-  const total = apps.length;
-  const interviews = apps.filter(a => a.status === 'interview' || a.status === 'offer').length;
-  const offers = apps.filter(a => a.status === 'offer').length;
-  const responded = apps.filter(a => !['applied','ghosted'].includes(a.status)).length;
-  document.getElementById('s-total').textContent = total;
-  document.getElementById('s-interview').textContent = interviews;
-  document.getElementById('s-offer').textContent = offers;
-  document.getElementById('s-rate').textContent = total > 0 ? Math.round((responded / total) * 100) + '%' : '—';
+  const today = toDateStr(new Date());
+  document.getElementById('s-today').textContent     = apps.filter(a=>a.date===today).length;
+  document.getElementById('s-streak').textContent    = getStreak();
+  document.getElementById('s-total').textContent     = apps.length;
+  document.getElementById('s-interview').textContent = apps.filter(a=>a.status==='interview'||a.status==='offer').length;
+  const responded = apps.filter(a=>!['applied','ghosted'].includes(a.status)).length;
+  document.getElementById('s-rate').textContent = apps.length > 0 ? Math.round((responded/apps.length)*100)+'%' : '—';
 }
 
 function render() {
   updateStats();
+  renderActivity();
   const list = document.getElementById('app-list');
-  const filtered = filter === 'all' ? apps : apps.filter(a => a.status === filter);
-  const sorted = [...filtered].sort((a,b) => new Date(b.date) - new Date(a.date));
-
-  if (sorted.length === 0) {
-    list.innerHTML = `<div class="empty">${filter === 'all' ? 'No applications yet — add your first one above.' : 'No applications with status "' + statusLabels[filter] + '".'}</div>`;
+  const filtered = filter==='all' ? apps : apps.filter(a=>a.status===filter);
+  const sorted = [...filtered].sort((a,b)=>new Date(b.date)-new Date(a.date));
+  if (!sorted.length) {
+    list.innerHTML = `<div class="empty">${filter==='all'?'No applications yet — add your first one above.':'No applications with status "'+statusLabels[filter]+'".'}</div>`;
     return;
   }
-
   list.innerHTML = sorted.map(a => {
-    const dateStr = a.date ? new Date(a.date + 'T12:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}) : '';
-    const opts = Object.entries(statusLabels).map(([v,l]) => `<option value="${v}"${v===a.status?' selected':''}>${l}</option>`).join('');
+    const dateStr = a.date ? new Date(a.date+'T12:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}) : '';
+    const opts = Object.entries(statusLabels).map(([v,l])=>`<option value="${v}"${v===a.status?' selected':''}>${l}</option>`).join('');
     return `<div class="app-card">
       <div>
         <div class="app-company">${esc(a.company)}</div>
         <div class="app-role">${esc(a.role)}</div>
         <div class="app-meta">
           <span class="badge ${statusClass[a.status]}">${statusLabels[a.status]}</span>
-          ${dateStr ? `<span>${dateStr}</span>` : ''}
+          ${dateStr?`<span>${dateStr}</span>`:''}
         </div>
-        ${a.notes ? `<div class="app-notes">${esc(a.notes)}</div>` : ''}
+        ${a.notes?`<div class="app-notes">${esc(a.notes)}</div>`:''}
       </div>
       <div class="app-right">
         <select class="status-sel" onchange="changeStatus('${a.id}',this.value)">${opts}</select>
@@ -201,60 +299,58 @@ function render() {
   }).join('');
 }
 
-function changeStatus(id, val) {
-  const a = apps.find(x => x.id === id);
-  if (a) { a.status = val; save(); render(); }
+function changeStatus(id,val) {
+  const a=apps.find(x=>x.id===id);
+  if(a){a.status=val;save();render();}
 }
 
 function deleteApp(id) {
-  if (!confirm('Remove this application?')) return;
-  apps = apps.filter(x => x.id !== id);
-  save(); render();
+  if(!confirm('Remove this application?'))return;
+  apps=apps.filter(x=>x.id!==id);
+  save();render();
 }
 
-document.getElementById('add-toggle').addEventListener('click', () => {
-  formOpen = !formOpen;
-  document.getElementById('add-form').classList.toggle('hidden', !formOpen);
-  document.getElementById('plus-icon').textContent = formOpen ? '×' : '+';
-  document.getElementById('toggle-label').textContent = formOpen ? 'Close' : 'Add new application';
-  if (formOpen) { document.getElementById('f-date').valueAsDate = new Date(); document.getElementById('f-company').focus(); }
+document.getElementById('add-toggle').addEventListener('click',()=>{
+  formOpen=!formOpen;
+  document.getElementById('add-form').classList.toggle('hidden',!formOpen);
+  document.getElementById('plus-icon').textContent=formOpen?'×':'+';
+  document.getElementById('toggle-label').textContent=formOpen?'Close':'Add new application';
+  if(formOpen){document.getElementById('f-date').valueAsDate=new Date();document.getElementById('f-company').focus();}
 });
 
-document.getElementById('cancel-btn').addEventListener('click', () => {
-  formOpen = false;
+document.getElementById('cancel-btn').addEventListener('click',()=>{
+  formOpen=false;
   document.getElementById('add-form').classList.add('hidden');
-  document.getElementById('plus-icon').textContent = '+';
-  document.getElementById('toggle-label').textContent = 'Add new application';
+  document.getElementById('plus-icon').textContent='+';
+  document.getElementById('toggle-label').textContent='Add new application';
 });
 
-document.getElementById('save-btn').addEventListener('click', () => {
-  const company = document.getElementById('f-company').value.trim();
-  const role = document.getElementById('f-role').value.trim();
-  if (!company) { document.getElementById('f-company').focus(); return; }
-  if (!role) { document.getElementById('f-role').focus(); return; }
-  apps.push({
-    id: Date.now().toString(),
-    company, role,
-    date: document.getElementById('f-date').value,
-    status: document.getElementById('f-status').value,
-    notes: document.getElementById('f-notes').value.trim()
+document.getElementById('save-btn').addEventListener('click',()=>{
+  const company=document.getElementById('f-company').value.trim();
+  const role=document.getElementById('f-role').value.trim();
+  if(!company){document.getElementById('f-company').focus();return;}
+  if(!role){document.getElementById('f-role').focus();return;}
+  apps.push({id:Date.now().toString(),company,role,
+    date:document.getElementById('f-date').value,
+    status:document.getElementById('f-status').value,
+    notes:document.getElementById('f-notes').value.trim()
   });
-  document.getElementById('f-company').value = '';
-  document.getElementById('f-role').value = '';
-  document.getElementById('f-notes').value = '';
-  document.getElementById('f-status').value = 'applied';
-  formOpen = false;
+  document.getElementById('f-company').value='';
+  document.getElementById('f-role').value='';
+  document.getElementById('f-notes').value='';
+  document.getElementById('f-status').value='applied';
+  formOpen=false;
   document.getElementById('add-form').classList.add('hidden');
-  document.getElementById('plus-icon').textContent = '+';
-  document.getElementById('toggle-label').textContent = 'Add new application';
-  save(); render();
+  document.getElementById('plus-icon').textContent='+';
+  document.getElementById('toggle-label').textContent='Add new application';
+  save();render();
 });
 
-document.getElementById('filters').addEventListener('click', e => {
-  const btn = e.target.closest('.filter-btn');
-  if (!btn) return;
-  filter = btn.dataset.filter;
-  document.querySelectorAll('.filter-btn').forEach(b => b.classList.toggle('active', b.dataset.filter === filter));
+document.getElementById('filters').addEventListener('click',e=>{
+  const btn=e.target.closest('.filter-btn');
+  if(!btn)return;
+  filter=btn.dataset.filter;
+  document.querySelectorAll('.filter-btn').forEach(b=>b.classList.toggle('active',b.dataset.filter===filter));
   render();
 });
 
